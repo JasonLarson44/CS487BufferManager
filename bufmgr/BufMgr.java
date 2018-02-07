@@ -90,13 +90,18 @@ public class BufMgr implements GlobalConst {
     if(frame != null) //If the page is in the buffer pool, alter the FrameDesc related to it.
     {
       this.FrameTab[frame.FrameNum].incrementPinCount(); //Page is already in a frame, increment pin count
+      //mempage.setPage(BufferPool[frame.FrameNum]);
     }
     else //Else attempt to add a new framedesc if the map is not full yet
     {
       if (Map.size() < this.PoolSize) //room to add
       {
         FrameNum = currentFrame;
-        currentFrame += 1;
+        if(currentFrame < PoolSize -1) {
+          currentFrame += 1;
+        }
+        else
+          currentFrame = 0;
       }
       else //No room to add, run replacement to select which page to evict
       {
@@ -119,7 +124,7 @@ public class BufMgr implements GlobalConst {
       //Time to read in page....
       if(contents == PIN_DISKIO){//If we need to read the page in from disk
         Minibase.DiskManager.read_page(pageno, BufferPool[FrameNum]);
-        mempage.copyPage(BufferPool[FrameNum]);
+        //mempage.setPage(BufferPool[FrameNum]);
         FrameTab[FrameNum].setValidBit(true);
       }
       else if(contents == PIN_MEMCPY){ //Copy mempage into buffer pool frame
