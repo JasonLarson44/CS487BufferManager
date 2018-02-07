@@ -90,7 +90,7 @@ public class BufMgr implements GlobalConst {
     if(frame != null) //If the page is in the buffer pool, alter the FrameDesc related to it.
     {
       this.FrameTab[frame.FrameNum].incrementPinCount(); //Page is already in a frame, increment pin count
-      //mempage.setPage(BufferPool[frame.FrameNum]);
+      mempage.setPage(BufferPool[frame.FrameNum]);
     }
     else //Else attempt to add a new framedesc if the map is not full yet
     {
@@ -124,7 +124,6 @@ public class BufMgr implements GlobalConst {
       //Time to read in page....
       if(contents == PIN_DISKIO){//If we need to read the page in from disk
         Minibase.DiskManager.read_page(pageno, BufferPool[FrameNum]);
-        //mempage.setPage(BufferPool[FrameNum]);
         FrameTab[FrameNum].setValidBit(true);
       }
       else if(contents == PIN_MEMCPY){ //Copy mempage into buffer pool frame
@@ -140,7 +139,7 @@ public class BufMgr implements GlobalConst {
       Map.put(FrameTab[FrameNum].pageNum, FrameTab[FrameNum]); //Add key value mapping from page no to its frame description to the hash map
       FrameTab[FrameNum].setDirtyBit(false);
       FrameTab[FrameNum].setPinCount(1);
-
+      mempage.setPage(BufferPool[FrameNum]);
     }
 
   } // public void pinPage(PageId pageno, Page page, int contents)

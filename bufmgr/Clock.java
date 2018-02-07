@@ -16,21 +16,26 @@ public class Clock {
     }
 
     public int selectVictim(FrameDesc[] frametable, int poolSize){
+        int victim = -1;
         for(int counter = 0; counter < poolSize*2; counter++) //loop through entire array up to two times
         {
-            if(!frametable[currentFrame].isValid()){//if data is not valid, kick it out
-                return currentFrame;
-            }
-            if(frametable[currentFrame].getPinCount() == 0) {
+            int pincnt = frametable[currentFrame].getPinCount();
+            if (pincnt < 1) {
+                if (!frametable[currentFrame].isValid()) {//if data is not valid, kick it out
+                    victim = currentFrame;
+                    currentFrame = (currentFrame + 1) % poolSize;
+                    return victim;
+                }
                 if (frametable[currentFrame].getReferenceBit() == 1) {
                     frametable[currentFrame].setReferenceBit(0);
-                }
-                else {
-                    return currentFrame;
+                } else {
+                    victim = currentFrame;
+                    currentFrame = (currentFrame + 1) % poolSize;
+                    return victim;
                 }
             }
             currentFrame = (currentFrame + 1) % poolSize;
         }
-        return -1; //No frame found to replace
+        return victim; //No frame found to replace
     }
 }
