@@ -119,6 +119,7 @@ public class BufMgr implements GlobalConst {
       //Time to read in page....
       if(contents == PIN_DISKIO){//If we need to read the page in from disk
         Minibase.DiskManager.read_page(pageno, BufferPool[FrameNum]);
+        mempage.copyPage(BufferPool[FrameNum]);
         FrameTab[FrameNum].setValidBit(true);
       }
       else if(contents == PIN_MEMCPY){ //Copy mempage into buffer pool frame
@@ -199,6 +200,10 @@ public class BufMgr implements GlobalConst {
     if(frame != null && frame.getPinCount() != 0) {
       throw new IllegalArgumentException("The page is pinned");
     }
+    else{
+      Map.remove(pageno);
+
+    }
 
 
   } // public void freePage(PageId firstid)
@@ -230,7 +235,7 @@ public class BufMgr implements GlobalConst {
     if(frame == null) {//page is not in buffer pool
       throw new IllegalArgumentException("The page is not in the buffer pool");
     }
-    if(frame.isDirty() && frame.isValid())//write it to disk
+    if(frame.isDirty())//write it to disk
     {
       Minibase.DiskManager.write_page(pageno, BufferPool[frame.getFrameNum()]);//the page in buffer pool should
       //be in the same position of the buffer pool array as the frame table
